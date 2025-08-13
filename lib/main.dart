@@ -307,7 +307,7 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                     if (_reactionTimeMs != null) ...[
                       const SizedBox(height: 10),
                       Text(
-                        '反応時間: ${_reactionTimeMs}ms',
+                        '反応時間: ${(_reactionTimeMs! / 16.67).round()}F (${_reactionTimeMs}ms)',
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],

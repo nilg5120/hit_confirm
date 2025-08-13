@@ -23,16 +23,16 @@ class HitConfirmApp extends StatelessWidget {
 }
 
 enum GameState {
-  waiting,    // 待機中
-  ready,      // スタート押下後、色変化待ち
-  active,     // 色変化後、入力待ち
-  result,     // 結果表示
+  waiting, // 待機中
+  ready, // スタート押下後、色変化待ち
+  active, // 色変化後、入力待ち
+  result, // 結果表示
 }
 
 enum IconColor {
-  neutral,    // グレー（初期状態）
-  hit,        // 黄色（ヒット、追撃可能）
-  guard,      // 青（ガード、追撃不可）
+  neutral, // グレー（初期状態）
+  hit, // 黄色（ヒット、追撃可能）
+  guard, // 青（ガード、追撃不可）
 }
 
 class HitConfirmScreen extends StatefulWidget {
@@ -45,23 +45,23 @@ class HitConfirmScreen extends StatefulWidget {
 class _HitConfirmScreenState extends State<HitConfirmScreen> {
   GameState _gameState = GameState.waiting;
   IconColor _iconColor = IconColor.neutral;
-  
+
   // 設定
   double _reactionFrames = 30.0; // 反応可能フレーム数（デフォルト30フレーム = 0.5秒）
   double _colorChangeFrames = 30.0; // 色変化タイミング（デフォルト30フレーム = 0.5秒）
-  
+
   // 統計
   int _totalAttempts = 0;
   int _successCount = 0;
   int _consecutiveSuccess = 0;
   int _maxConsecutiveSuccess = 0;
-  
+
   // ゲーム制御
   Timer? _gameTimer;
   Timer? _reactionTimer;
   DateTime? _colorChangeTime;
   final Random _random = Random();
-  
+
   // 結果表示
   String _resultMessage = '';
   int? _reactionTimeMs;
@@ -75,7 +75,7 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
 
   void _startGame() {
     if (_gameState != GameState.waiting) return;
-    
+
     setState(() {
       _gameState = GameState.ready;
       _iconColor = IconColor.neutral;
@@ -93,7 +93,7 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
 
     final isHit = _random.nextBool();
     _colorChangeTime = DateTime.now();
-    
+
     setState(() {
       _gameState = GameState.active;
       _iconColor = isHit ? IconColor.hit : IconColor.guard;
@@ -108,17 +108,18 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
     if (_gameState != GameState.active) return;
 
     _reactionTimer?.cancel();
-    
-    final reactionTime = DateTime.now().difference(_colorChangeTime!).inMilliseconds;
+
+    final reactionTime =
+        DateTime.now().difference(_colorChangeTime!).inMilliseconds;
     final wasHit = _iconColor == IconColor.hit;
     final wasCorrect = wasHit; // 黄色（ヒット）の時に押すのが正解
-    
+
     _totalAttempts++;
-    
+
     setState(() {
       _gameState = GameState.result;
       _reactionTimeMs = reactionTime;
-      
+
       if (wasCorrect) {
         _successCount++;
         _consecutiveSuccess++;
@@ -141,11 +142,11 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
 
     final wasHit = _iconColor == IconColor.hit;
     _totalAttempts++;
-    
+
     setState(() {
       _gameState = GameState.result;
-// ガードの時に押さないのが正解
-      
+      // ガードの時に押さないのが正解
+
       if (!wasHit) {
         // ガードの時に押さなかった = 正解
         _successCount++;
@@ -238,13 +239,14 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                         min: 10.0,
                         max: 60.0,
                         divisions: 50,
-                        onChanged: _gameState == GameState.waiting
-                            ? (value) {
-                                setState(() {
-                                  _reactionFrames = value;
-                                });
-                              }
-                            : null,
+                        onChanged:
+                            _gameState == GameState.waiting
+                                ? (value) {
+                                  setState(() {
+                                    _reactionFrames = value;
+                                  });
+                                }
+                                : null,
                       ),
                       Text(
                         '色変化: ${_colorChangeFrames.round()}F (${(_colorChangeFrames * 16.67 / 1000).toStringAsFixed(2)}s)',
@@ -255,21 +257,22 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                         min: 1.0,
                         max: 60.0,
                         divisions: 59,
-                        onChanged: _gameState == GameState.waiting
-                            ? (value) {
-                                setState(() {
-                                  _colorChangeFrames = value;
-                                });
-                              }
-                            : null,
+                        onChanged:
+                            _gameState == GameState.waiting
+                                ? (value) {
+                                  setState(() {
+                                    _colorChangeFrames = value;
+                                  });
+                                }
+                                : null,
                       ),
                     ],
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // メインゲームエリア
               SizedBox(
                 height: 400,
@@ -291,16 +294,16 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                         color: Colors.white,
                       ),
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // 状態テキスト
                     Text(
                       _getGameStateText(),
                       style: Theme.of(context).textTheme.headlineSmall,
                       textAlign: TextAlign.center,
                     ),
-                    
+
                     if (_reactionTimeMs != null) ...[
                       const SizedBox(height: 10),
                       Text(
@@ -308,25 +311,30 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
-                    
+
                     const SizedBox(height: 30),
-                    
+
                     // コントロールボタン（同じ位置に配置）
                     SizedBox(
                       width: 150,
                       height: 60,
                       child: ElevatedButton(
-                        onPressed: _gameState == GameState.waiting 
-                            ? _startGame 
-                            : _gameState == GameState.active 
-                                ? _onAttackPressed 
+                        onPressed:
+                            _gameState == GameState.waiting
+                                ? _startGame
+                                : _gameState == GameState.active
+                                ? _onAttackPressed
                                 : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _gameState == GameState.waiting 
-                              ? Colors.green 
-                              : Colors.red,
+                          backgroundColor:
+                              _gameState == GameState.waiting
+                                  ? Colors.green
+                                  : Colors.red,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 30,
+                            vertical: 15,
+                          ),
                         ),
                         child: Text(
                           _gameState == GameState.waiting ? 'スタート' : '追撃',
@@ -337,9 +345,9 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // 統計表示
               Card(
                 child: Padding(
@@ -349,7 +357,13 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('統計', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          const Text(
+                            '統計',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           TextButton(
                             onPressed: _resetStats,
                             child: const Text('リセット'),
@@ -362,22 +376,37 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                         children: [
                           Column(
                             children: [
-                              Text('${_successRate.toStringAsFixed(1)}%', 
-                                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                              Text(
+                                '${_successRate.toStringAsFixed(1)}%',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               const Text('成功率'),
                             ],
                           ),
                           Column(
                             children: [
-                              Text('$_consecutiveSuccess', 
-                                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                              Text(
+                                '$_consecutiveSuccess',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               const Text('連続成功'),
                             ],
                           ),
                           Column(
                             children: [
-                              Text('$_maxConsecutiveSuccess', 
-                                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                              Text(
+                                '$_maxConsecutiveSuccess',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               const Text('最高連続'),
                             ],
                           ),

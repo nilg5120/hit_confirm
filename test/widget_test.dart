@@ -31,20 +31,22 @@ void main() {
 
     // Find both sliders and verify they exist
     expect(find.byType(Slider), findsNWidgets(2));
-    
+
     // Verify initial frame settings are displayed
     expect(find.textContaining('反応時間: 30F'), findsOneWidget);
     expect(find.textContaining('色変化: 30F'), findsOneWidget);
   });
 
-  testWidgets('Single button changes based on game state', (WidgetTester tester) async {
+  testWidgets('Single button changes based on game state', (
+    WidgetTester tester,
+  ) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const HitConfirmApp());
 
     // Initially should show "スタート" button
     expect(find.text('スタート'), findsOneWidget);
     expect(find.text('追撃'), findsNothing);
-    
+
     // Verify button is centered and has correct size
     final buttonFinder = find.byType(ElevatedButton);
     expect(buttonFinder, findsOneWidget);

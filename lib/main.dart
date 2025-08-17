@@ -206,6 +206,14 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
     }
   }
 
+  void _handlePrimaryPressDown() {
+    if (_gameState == GameState.waiting) {
+      _startGame();           // スタートは押した瞬間
+    } else if (_gameState == GameState.active) {
+      _onAttackPressed();     // 追撃も押した瞬間
+    }
+  }
+
   double get _successRate {
     if (_totalAttempts == 0) return 0.0;
     return (_successCount / _totalAttempts) * 100;
@@ -304,13 +312,7 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                       textAlign: TextAlign.center,
                     ),
 
-                    if (_reactionTimeMs != null) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        '反応時間: ${(_reactionTimeMs! / 16.67).round()}F (${_reactionTimeMs}ms)',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
+
 
                     const SizedBox(height: 30),
 
@@ -318,33 +320,39 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                     SizedBox(
                       width: 150,
                       height: 60,
-                      child: ElevatedButton(
-                        onPressed:
-                            _gameState == GameState.waiting
-                                ? _startGame
-                                : _gameState == GameState.active
-                                ? _onAttackPressed
-                                : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              _gameState == GameState.waiting
-                                  ? Colors.green
-                                  : Colors.red,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 15,
+                      child: Material(
+                        color: _gameState == GameState.waiting
+                            ? Colors.green
+                            : _gameState == GameState.active
+                                ? Colors.red
+                                : Colors.grey, // 非アクティブ時
+                        borderRadius: BorderRadius.circular(8),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          // 押下した瞬間に発火
+                          onTapDown: (_gameState == GameState.waiting || _gameState == GameState.active)
+                              ? (_) => _handlePrimaryPressDown()
+                              : null,
+                          child: Center(
+                            child: Text(
+                              _gameState == GameState.waiting ? 'スタート' : '追撃',
+                              style: const TextStyle(fontSize: 18, color: Colors.white),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          _gameState == GameState.waiting ? 'スタート' : '追撃',
-                          style: const TextStyle(fontSize: 18),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
+
+            if (_reactionTimeMs != null) ...[
+              const SizedBox(height: 10),
+              Text(
+                '反応時間: ${(_reactionTimeMs! / 16.67).round()}F (${_reactionTimeMs}ms)',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
 
               const SizedBox(height: 20),
 

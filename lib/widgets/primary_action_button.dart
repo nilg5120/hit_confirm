@@ -15,8 +15,9 @@ class PrimaryActionButton extends StatelessWidget {
 
   Color _buttonColor() {
     if (gameState == GameState.waiting) return Colors.green;
-    if (gameState == GameState.active || gameState == GameState.timeout)
+    if (gameState == GameState.active || gameState == GameState.timeout) {
       return Colors.red;
+    }
     return Colors.grey;
   }
 
@@ -41,7 +42,7 @@ class PrimaryActionButton extends StatelessWidget {
           onTapDown: _isTapEnabled ? onTapDown : null,
           child: Center(
             child: Text(
-              _label(),
+              _label(), // ← ここで呼び出す
               style: const TextStyle(fontSize: 18, color: Colors.white),
             ),
           ),

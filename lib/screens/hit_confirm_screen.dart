@@ -30,6 +30,7 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
   // ゲーム制御
   Timer? _gameTimer;
   Timer? _reactionTimer;
+  Timer? _delayedInputTimer;
   DateTime? _colorChangeTime;
   final Random _random = Random();
 
@@ -41,6 +42,7 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
   void dispose() {
     _gameTimer?.cancel();
     _reactionTimer?.cancel();
+    _delayedInputTimer?.cancel();
     super.dispose();
   }
 
@@ -118,20 +120,54 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
     final wasHit = _iconColor == IconColor.hit;
     _totalAttempts++;
 
-    setState(() {
-      _gameState = GameState.result;
-      // ガードの時に押さないのが正解
-      if (!wasHit) {
+    if (wasHit) {
+      // 追撃の場合（黄色）は遅延入力を受け付ける
+      setState(() {
+        _gameState = GameState.timeout;
+        _consecutiveSuccess = 0;
+        _resultMessage = '失敗... ヒット確認できませんでした';
+      });
+
+      // 0.5秒間遅延入力を受け付ける
+      _delayedInputTimer?.cancel();
+      _delayedInputTimer = Timer(const Duration(milliseconds: 500), () {
+        if (_gameState == GameState.timeout) {
+          setState(() {
+            _gameState = GameState.result;
+          });
+          // 2秒後に次のラウンドへ
+          Timer(const Duration(seconds: 2), _resetGame);
+        }
+      });
+    } else {
+      // ガードの場合（青）は従来通りの処理
+      setState(() {
+        _gameState = GameState.result;
         _successCount++;
         _consecutiveSuccess++;
         if (_consecutiveSuccess > _maxConsecutiveSuccess) {
           _maxConsecutiveSuccess = _consecutiveSuccess;
         }
         _resultMessage = '正解！ ガードを見切りました';
-      } else {
-        _consecutiveSuccess = 0;
-        _resultMessage = '失敗... ヒット確認できませんでした';
-      }
+      });
+
+      // 2秒後に次のラウンドへ
+      Timer(const Duration(seconds: 2), _resetGame);
+    }
+  }
+
+  void _onDelayedAttackPressed() {
+    if (_gameState != GameState.timeout) return;
+
+    _delayedInputTimer?.cancel();
+
+    final reactionTime =
+        DateTime.now().difference(_colorChangeTime!).inMilliseconds;
+
+    setState(() {
+      _gameState = GameState.result;
+      _reactionTimeMs = reactionTime;
+      // メッセージは既に設定済み（失敗メッセージ）
     });
 
     // 2秒後に次のラウンドへ
@@ -165,6 +201,8 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
       case GameState.ready:
         return '準備中...';
       case GameState.active:
+        return _iconColor == IconColor.hit ? '黄色！追撃！' : '青！ガード！';
+      case GameState.timeout:
         return _iconColor == IconColor.hit ? '黄色！追撃！' : '青！ガード！';
       case GameState.result:
         return _resultMessage;
@@ -271,6 +309,8 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
       _startGame(); // スタートは押した瞬間
     } else if (_gameState == GameState.active) {
       _onAttackPressed(); // 追撃も押した瞬間
+    } else if (_gameState == GameState.timeout) {
+      _onDelayedAttackPressed(); // 遅延入力
     }
   }
 

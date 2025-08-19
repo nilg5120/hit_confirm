@@ -2,6 +2,7 @@ enum GameState {
   waiting, // 待機中
   ready, // スタート押下後、色変化待ち
   active, // 色変化後、入力待ち
+  timeout, // タイムアウト後、遅延入力待ち
   result, // 結果表示
 }
 

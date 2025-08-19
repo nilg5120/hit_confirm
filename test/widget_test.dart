@@ -16,7 +16,7 @@ void main() {
     expect(find.text('総試行回数: 0回 / 成功: 0回'), findsOneWidget);
   });
 
-  testWidgets('設定スライダーが動作する', (WidgetTester tester) async {
+  testWidgets('設定スライダーの初期化確認', (WidgetTester tester) async {
     await tester.pumpWidget(const HitConfirmApp());
 
     expect(find.byType(Slider), findsNWidgets(2));
@@ -36,10 +36,12 @@ void main() {
     expect(button, findsOneWidget);
 
     // 初期色（waiting=緑）
-    final materialAt =
-        () => tester.widget<Material>(
-          find.ancestor(of: button, matching: find.byType(Material)).first,
-        );
+    Material materialAt() {
+      return tester.widget<Material>(
+        find.ancestor(of: button, matching: find.byType(Material)).first,
+      );
+    }
+
     expect(materialAt().color, equals(Colors.green));
 
     // 1タップで waiting→ready（準備中）へ：色=灰、ラベル=「追撃」

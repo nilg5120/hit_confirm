@@ -1,0 +1,68 @@
+@startuml ゲーム状態遷移図
+!theme plain
+title ヒット確認アプリ - GameState状態遷移図
+
+[*] --> waiting : アプリ起動
+
+state waiting {
+  waiting : GameState.waiting
+  waiting : - スタートボタン表示（緑色）
+  waiting : - "スタートボタンを押してください"
+}
+
+state ready {
+  ready : GameState.ready
+  ready : - "準備中..."表示
+  ready : - 色変化タイマー実行中
+}
+
+state active {
+  active : GameState.active
+  active : - 色表示（黄色 or 青色）
+  active : - 追撃ボタン表示（赤色）
+  active : - 反応時間タイマー実行中
+}
+
+state timeout {
+  timeout : GameState.timeout
+  timeout : - 追撃失敗後の遅延入力受付状態
+  timeout : - 追撃ボタン有効（赤色）
+  timeout : - 遅延入力タイマー実行中（500ms）
+  timeout : - "失敗...ヒット確認できませんでした"
+}
+
+state result {
+  result : GameState.result
+  result : - 結果メッセージ表示
+  result : - 反応時間表示
+  result : - 統計更新
+  result : - 2秒後リセットタイマー実行中
+}
+
+waiting --> ready : スタートボタン押下\n_startGame()
+
+ready --> active : 色変化タイマー満了\n_changeColor()
+
+active --> result : ボタン押下（時間内）\n_onAttackPressed()
+active --> timeout : タイムアウト（黄色の場合）\n_timeOut()
+active --> result : タイムアウト（青色の場合）\n_timeOut()
+
+timeout --> result : 遅延ボタン押下\n_onDelayedAttackPressed()
+timeout --> result : 遅延入力タイマー満了
+
+result --> waiting : リセットタイマー満了\n_resetGame()
+
+note top of timeout
+  新機能: timeout状態
+  - 追撃（黄色）のタイムアウト時のみ
+  - 0.5秒間の遅延入力受付
+  - 遅延反応時間も測定
+end note
+
+note bottom of active
+  色による分岐:
+  - 黄色（hit）: 押すのが正解
+  - 青色（guard）: 押さないのが正解
+end note
+
+@enduml

@@ -1,0 +1,117 @@
+@startuml ヒット確認アプリ_シーケンス図
+!theme plain
+title ヒット確認アプリ - ゲームフローシーケンス図
+
+actor User as "ユーザー"
+participant UI as "HitConfirmScreen"
+participant Button as "PrimaryActionButton"
+participant Timer as "Timer"
+participant Stats as "StatsCard"
+
+== 初期状態 ==
+User -> UI: アプリ起動
+UI -> UI: setState(GameState.waiting)
+UI -> Button: gameState = waiting
+Button -> User: "スタート"ボタン表示（緑色）
+
+== ゲーム開始 ==
+User -> Button: スタートボタン押下
+Button -> UI: onTapDown()
+UI -> UI: _startGame()
+UI -> UI: setState(GameState.ready)
+UI -> Timer: 色変化タイマー開始\n(colorChangeFrames * 16.67ms)
+UI -> User: "準備中..."表示
+
+== 色変化 ==
+Timer -> UI: タイマー満了
+UI -> UI: _changeColor()
+UI -> UI: ランダムで色決定\n(hit: 黄色 / guard: 青色)
+UI -> UI: setState(GameState.active)
+UI -> Timer: 反応時間タイマー開始\n(reactionFrames * 16.67ms)
+
+alt 黄色（ヒット）の場合
+    UI -> User: "黄色！追撃！"表示
+    UI -> Button: gameState = active
+    Button -> User: "追撃"ボタン表示（赤色）
+    
+    alt 時間内にボタン押下（成功）
+        User -> Button: 追撃ボタン押下
+        Button -> UI: onTapDown()
+        UI -> UI: _onAttackPressed()
+        UI -> Timer: 反応時間タイマー停止
+        UI -> UI: 反応時間計算
+        UI -> UI: setState(GameState.result)
+        UI -> Stats: 成功カウント更新
+        UI -> User: "成功！ヒット確認できました"表示
+        UI -> Stats: 反応時間表示
+        UI -> Timer: 2秒後リセットタイマー開始
+    else 時間内にボタン押下なし（タイムアウト）
+        Timer -> UI: 反応時間タイマー満了
+        UI -> UI: _timeOut()
+        UI -> UI: setState(GameState.timeout)
+        UI -> Timer: 遅延入力タイマー開始(500ms)
+        UI -> User: "失敗...ヒット確認できませんでした"表示
+        UI -> Button: gameState = timeout
+        Button -> User: "追撃"ボタン有効（赤色）
+        
+        alt 遅延入力あり
+            User -> Button: 遅延追撃ボタン押下
+            Button -> UI: onTapDown()
+            UI -> UI: _onDelayedAttackPressed()
+            UI -> Timer: 遅延入力タイマー停止
+            UI -> UI: 遅延反応時間計算
+            UI -> UI: setState(GameState.result)
+            UI -> Stats: 失敗カウント更新（既に更新済み）
+            UI -> Stats: 遅延反応時間表示
+            UI -> Timer: 2秒後リセットタイマー開始
+        else 遅延入力なし
+            Timer -> UI: 遅延入力タイマー満了
+            UI -> UI: setState(GameState.result)
+            UI -> Timer: 2秒後リセットタイマー開始
+        end
+    end
+
+else 青色（ガード）の場合
+    UI -> User: "青！ガード！"表示
+    UI -> Button: gameState = active
+    Button -> User: "追撃"ボタン表示（赤色）
+    
+    alt 時間内にボタン押下（失敗）
+        User -> Button: 追撃ボタン押下
+        Button -> UI: onTapDown()
+        UI -> UI: _onAttackPressed()
+        UI -> Timer: 反応時間タイマー停止
+        UI -> UI: 反応時間計算
+        UI -> UI: setState(GameState.result)
+        UI -> Stats: 失敗カウント更新
+        UI -> User: "失敗...ガードされていました"表示
+        UI -> Stats: 反応時間表示
+        UI -> Timer: 2秒後リセットタイマー開始
+    else 時間内にボタン押下なし（成功）
+        Timer -> UI: 反応時間タイマー満了
+        UI -> UI: _timeOut()
+        UI -> UI: setState(GameState.result)
+        UI -> Stats: 成功カウント更新
+        UI -> User: "正解！ガードを見切りました"表示
+        UI -> Timer: 2秒後リセットタイマー開始
+    end
+end
+
+== ゲーム終了・リセット ==
+Timer -> UI: リセットタイマー満了
+UI -> UI: _resetGame()
+UI -> UI: setState(GameState.waiting)
+UI -> Button: gameState = waiting
+Button -> User: "スタート"ボタン表示（緑色）
+
+note right of UI
+  GameState遷移:
+  waiting → ready → active → (timeout) → result → waiting
+  
+  新機能: timeout状態
+  - 追撃の場合のタイムアウト後0.5秒間
+  - 遅延入力を受け付ける
+  - 遅延反応時間も測定・表示
+end note
+
+@enduml

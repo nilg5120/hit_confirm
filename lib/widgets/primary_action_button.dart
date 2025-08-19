@@ -15,14 +15,17 @@ class PrimaryActionButton extends StatelessWidget {
 
   Color _buttonColor() {
     if (gameState == GameState.waiting) return Colors.green;
-    if (gameState == GameState.active || gameState == GameState.timeout) return Colors.red;
+    if (gameState == GameState.active || gameState == GameState.timeout)
+      return Colors.red;
     return Colors.grey;
   }
 
   String _label() => gameState == GameState.waiting ? 'スタート' : '追撃';
 
   bool get _isTapEnabled =>
-      gameState == GameState.waiting || gameState == GameState.active || gameState == GameState.timeout;
+      gameState == GameState.waiting ||
+      gameState == GameState.active ||
+      gameState == GameState.timeout;
 
   @override
   Widget build(BuildContext context) {

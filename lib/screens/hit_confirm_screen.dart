@@ -18,7 +18,7 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
   IconColor _iconColor = IconColor.neutral;
 
   // 設定
-  double _reactionFrames = 30.0;   // 反応可能フレーム数（30F ≈ 0.5s）
+  double _reactionFrames = 30.0; // 反応可能フレーム数（30F ≈ 0.5s）
   double _colorChangeFrames = 30.0; // 色変化タイミング（30F ≈ 0.5s）
 
   // 統計
@@ -195,12 +195,14 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
                 gameState: _gameState,
                 reactionFrames: _reactionFrames,
                 colorChangeFrames: _colorChangeFrames,
-                onChangeReactionFrames: (v) => setState(() {
-                  _reactionFrames = v;
-                }),
-                onChangeColorChangeFrames: (v) => setState(() {
-                  _colorChangeFrames = v;
-                }),
+                onChangeReactionFrames:
+                    (v) => setState(() {
+                      _reactionFrames = v;
+                    }),
+                onChangeColorChangeFrames:
+                    (v) => setState(() {
+                      _colorChangeFrames = v;
+                    }),
               ),
 
               const SizedBox(height: 20),
@@ -266,9 +268,9 @@ class _HitConfirmScreenState extends State<HitConfirmScreen> {
 
   void _handlePrimaryPressDown() {
     if (_gameState == GameState.waiting) {
-      _startGame();           // スタートは押した瞬間
+      _startGame(); // スタートは押した瞬間
     } else if (_gameState == GameState.active) {
-      _onAttackPressed();     // 追撃も押した瞬間
+      _onAttackPressed(); // 追撃も押した瞬間
     }
   }
 

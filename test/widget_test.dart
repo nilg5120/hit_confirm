@@ -36,14 +36,15 @@ void main() {
     expect(button, findsOneWidget);
 
     // 初期色（waiting=緑）
-    final materialAt = () => tester.widget<Material>(
+    final materialAt =
+        () => tester.widget<Material>(
           find.ancestor(of: button, matching: find.byType(Material)).first,
         );
     expect(materialAt().color, equals(Colors.green));
 
     // 1タップで waiting→ready（準備中）へ：色=灰、ラベル=「追撃」
     await tester.tap(button); // onTapDown で _startGame()
-    await tester.pump();      // setState 反映
+    await tester.pump(); // setState 反映
     expect(find.text('スタート'), findsNothing);
     expect(find.text('追撃'), findsOneWidget);
     expect(materialAt().color, equals(Colors.grey));

@@ -42,12 +42,12 @@ class StatsCard extends StatelessWidget {
                   children: [
                     const Text(
                       '統計',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    TextButton(
-                      onPressed: onReset,
-                      child: const Text('リセット'),
-                    ),
+                    TextButton(onPressed: onReset, child: const Text('リセット')),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -59,7 +59,9 @@ class StatsCard extends StatelessWidget {
                         Text(
                           '${successRate.toStringAsFixed(1)}%',
                           style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const Text('成功率'),
                       ],
@@ -69,7 +71,9 @@ class StatsCard extends StatelessWidget {
                         Text(
                           '$consecutiveSuccess',
                           style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const Text('連続成功'),
                       ],
@@ -79,7 +83,9 @@ class StatsCard extends StatelessWidget {
                         Text(
                           '$maxConsecutiveSuccess',
                           style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const Text('最高連続'),
                       ],

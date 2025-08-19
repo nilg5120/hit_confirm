@@ -185,6 +185,15 @@ flutter test
 flutter test test/widget_test.dart
 ```
 
+## CI (GitHub Actions)
+
+- ファイル: `.github/workflows/ci.yml`
+- main ブランチへの push / PR で実行されます
+- 実行内容:
+  1. `dart format --set-exit-if-changed .` （コード整形確認）
+  2. `flutter analyze` （静的解析）
+  3. `flutter test` （ユニットテスト）
+
 ## 貢献
 
 1. このリポジトリをフォーク
